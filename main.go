@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yrong/websocketd/libwebsocketd"
+	"OpsAgent/libwebsocketd"
 )
 
 func log(l *libwebsocketd.LogScope, level libwebsocketd.LogLevel, levelName string, category string, msg string, args ...interface{}) {
