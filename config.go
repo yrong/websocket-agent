@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joewalnes/websocketd/libwebsocketd"
+	"github.com/yrong/websocketd/libwebsocketd"
 )
 
 type Config struct {
@@ -64,7 +64,7 @@ func parseCommandLine() *Config {
 	flag.Var(&addrlist, "address", "Interfaces to bind to (e.g. 127.0.0.1 or [::1]).")
 
 	// server config options
-	portFlag := flag.Int("port", 0, "HTTP port to listen on")
+	portFlag := flag.Int("port", 8081, "HTTP port to listen on")
 	versionFlag := flag.Bool("version", false, "Print version and exit")
 	licenseFlag := flag.Bool("license", false, "Print license and exit")
 	logLevelFlag := flag.String("loglevel", "access", "Log level, one of: debug, trace, access, info, error, fatal")

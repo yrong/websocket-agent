@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>WS-console</title>
+</head>
+<body>  
+  IP: <input id="ip" type="text" value="127.0.0.1">
+  Port: <input id="port" type="text" value="8081"><br/>
+  <textarea id="txt" cols="60" rows="10">
+    for i = 1 to 10
+  WScript.echo i
+  WScript.sleep 200
+next</textarea><br/>
+  <input id="btn" type="button" value="R U N"/>
+  <input id="vbs" type="radio" name="code" checked>
+  <input id="js" type="radio" name="code">
+  <pre id="log"></pre>
+  <script>
+    document.getElementById('txt').focus();
+    document.getElementById("vbs").style.display = "none";
+    document.getElementById("js").style.display = "none";
+    btn.addEventListener('click', function(e) {
+      var ip = document.getElementById('ip').value,
+          port = document.getElementById('port').value,
+          ws = new WebSocket('ws://' + ip + ':' + port);
+      ws.onopen = function() {
+        log('CONNECTED');
+        var d = document.all ? '\r\n' : '\n';			
+        var arr = txt.value.split(d);
+        var js = document.getElementById('js'), msg;
+        if (js.checked) {
+          for (var i=0; i<arr.length; i++) {
+            arr[i] = arr[i].replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/g, '');
+          }
+          msg = arr.join(' ');
+        } else {
+          var und = false;
+          for (var i=0; i<arr.length; i++) {
+            if (arr[i].search(/ _$/) != -1) {
+              arr[i] = arr[i].replace(/ _$/, '');
+              arr[i] += arr[i+1];
+              arr.splice(i+1, 1);
+              i--;
+              continue;      
+            }
+            arr[i] = arr[i].replace(/^\s+|^\s*(?:'|\brem\b).*$|(?:'|\brem\b)[^(?:\"|_$)].*$|\s+$/gi, '');          
+          }
+          msg = arr.join(' : ');
+        }        
+        ws.send(msg);      
+      };    
+      ws.onmessage = function(e) {
+        log('MESSAGE:   ' + e.data);
+      };
+      ws.onclose = function(e) {
+        log('DISCONNECTED');
+        log('Clean = ' + e.wasClean + ', Code = ' + e.code + ', Reason = ' + (e.reason || 'none'));
+      };
+    });  
+    function log(msg) {
+      document.getElementById('log').innerText += msg + '\n';
+    }
+  </script>
+</body>
+</html>

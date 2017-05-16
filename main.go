@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/joewalnes/websocketd/libwebsocketd"
+	"github.com/yrong/websocketd/libwebsocketd"
 )
 
 func log(l *libwebsocketd.LogScope, level libwebsocketd.LogLevel, levelName string, category string, msg string, args ...interface{}) {
@@ -50,7 +50,7 @@ func main() {
 		}
 	}
 
-	os.Clearenv() // it's ok to wipe it clean, we already read env variables from passenv into config
+	//os.Clearenv() // it's ok to wipe it clean, we already read env variables from passenv into config
 	handler := libwebsocketd.NewWebsocketdServer(config.Config, log, config.MaxForks)
 	http.Handle("/", handler)
 

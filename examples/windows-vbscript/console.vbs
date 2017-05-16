@@ -1,0 +1,1 @@
+Call Execute(WScript.StdIn.ReadLine())
