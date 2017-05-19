@@ -85,6 +85,9 @@ func parseCommandLine() *Config {
 	passEnvFlag := flag.String("passenv", defaultPassEnv[runtime.GOOS], "List of envvars to pass to subprocesses (others will be cleaned out)")
 	sameOriginFlag := flag.Bool("sameorigin", false, "Restrict upgrades if origin and host headers differ")
 	allowOriginsFlag := flag.String("origin", "", "Restrict upgrades if origin does not match the list")
+	canonicalHostname, _ := os.Hostname()
+	agentName := flag.String("agentname",canonicalHostname,"agent name(hostname as default)")
+	es_url := flag.String("esurl","http://localhost:9200","agent name(hostname as default)")
 
 	headers := Arglist(make([]string, 0))
 	headersWs := Arglist(make([]string, 0))
@@ -144,6 +147,8 @@ func parseCommandLine() *Config {
 	config.DevConsole = *devConsoleFlag
 	config.StartupTime = time.Now()
 	config.ServerSoftware = fmt.Sprintf("websocketd/%s", Version())
+	config.HostName = *agentName
+	config.EsUrl = *es_url
 
 	if len(os.Args) == 1 {
 		fmt.Printf("Command line arguments are missing.\n")

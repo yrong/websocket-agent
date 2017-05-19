@@ -84,8 +84,7 @@ func (wsh *WebsocketdHandler) accept(ws *websocket.Conn, log *LogScope) {
 		process.closetime += time.Duration(cms) * time.Millisecond
 	}
 	wsEndpoint := NewWebSocketEndpoint(ws, binary, log)
-
-	PipeEndpoints(process, wsEndpoint)
+	PipeEndpoints(process, wsEndpoint, wsh)
 }
 
 // RemoteInfo holds information about remote http client

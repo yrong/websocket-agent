@@ -49,10 +49,12 @@ func main() {
 			os.Exit(4)
 		}
 	}
-
+	//log.Info("server","env : %s",strings.Join(os.Environ(),"\n"))
 	//os.Clearenv() // it's ok to wipe it clean, we already read env variables from passenv into config
-	handler := libwebsocketd.NewWebsocketdServer(config.Config, log, config.MaxForks)
-	http.Handle("/", handler)
+	//log.Info("server","config parent env : %s",strings.Join(config.ParentEnv,"\n"))
+	es_handler := libwebsocketd.NewESHandler(config.Config,log)
+	http_handler := libwebsocketd.NewWebsocketdServer(config.Config, log, config.MaxForks,es_handler)
+	http.Handle("/", http_handler)
 
 	if config.UsingScriptDir {
 		log.Info("server", "Serving from directory      : %s", config.ScriptDir)
@@ -68,11 +70,11 @@ func main() {
 
 	rejects := make(chan error, 1)
 	for _, addrSingle := range config.Addr {
-		log.Info("server", "Starting WebSocket server   : %s", handler.TellURL("ws", addrSingle, "/"))
+		log.Info("server", "Starting WebSocket server   : %s", http_handler.TellURL("ws", addrSingle, "/"))
 		if config.DevConsole {
-			log.Info("server", "Developer console enabled   : %s", handler.TellURL("http", addrSingle, "/"))
+			log.Info("server", "Developer console enabled   : %s", http_handler.TellURL("http", addrSingle, "/"))
 		} else if config.StaticDir != "" || config.CgiDir != "" {
-			log.Info("server", "Serving CGI or static files : %s", handler.TellURL("http", addrSingle, "/"))
+			log.Info("server", "Serving CGI or static files : %s", http_handler.TellURL("http", addrSingle, "/"))
 		}
 		// ListenAndServe is blocking function. Let's run it in
 		// go routine, reporting result to control channel.

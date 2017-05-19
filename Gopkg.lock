@@ -1,0 +1,19 @@
+memo = "548a2e4463b12b7b73c79a7d413aaafe8891f3a18c5e76be5c846a62eee40db1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "c605e284fe17294bda444b34710735b29d1a9d90"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["websocket"]
+  revision = "513929065c19401a1c7b76ecd942f9f86a0c061b"
+
+[[projects]]
+  branch = "master"
+  name = "gopkg.in/olivere/elastic.v5"
+  packages = [".","uritemplates"]
+  revision = "3f49414dc29d45ba96fde19ba72bc646077dbffd"

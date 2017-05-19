@@ -28,13 +28,15 @@ type WebsocketdServer struct {
 	Config *Config
 	Log    *LogScope
 	forks  chan byte
+	es_handler *EsHandler
 }
 
 // NewWebsocketdServer creates WebsocketdServer struct with pre-determined config, logscope and maxforks limit
-func NewWebsocketdServer(config *Config, log *LogScope, maxforks int) *WebsocketdServer {
+func NewWebsocketdServer(config *Config, log *LogScope, maxforks int, es_handler *EsHandler) *WebsocketdServer {
 	mux := &WebsocketdServer{
 		Config: config,
 		Log:    log,
+		es_handler: es_handler,
 	}
 	if maxforks > 0 {
 		mux.forks = make(chan byte, maxforks)

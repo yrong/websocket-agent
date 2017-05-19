@@ -4,3 +4,5 @@ websocketd
 go
 go-v*
 go-workspace
+.idea
+vendor

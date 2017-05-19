@@ -35,4 +35,6 @@ type Config struct {
 	// created environment
 	Env       []string // Additional environment variables to pass to process ("key=value").
 	ParentEnv []string // Variables kept from os.Environ() before sanitizing it for subprocess.
+	HostName string
+	EsUrl   string
 }
