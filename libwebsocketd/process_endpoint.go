@@ -151,6 +151,7 @@ func (pe *ProcessEndpoint) log_stderr() {
 			break
 		}
 		pe.log.Error("stderr", "%s", string(trimEOL(buf)))
+		pe.output <- trimEOL(buf)
 	}
 }
 

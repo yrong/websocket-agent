@@ -38,15 +38,18 @@ func PipeEndpoints(e1, e2 Endpoint, wsh *WebsocketdHandler) {
 			if !ok || !e2.Send(msgOne) {
 				return
 			}
-			indexToEs(e1,e2,wsh,string(msgOne),-1)
+			if(len(wsh.server.Config.EsUrl)>0){
+				indexToEs(e1,e2,wsh,string(msgOne),-1)
+			}
 		case msgTwo, ok := <-e2.Output():
 			if !ok || !e1.Send(msgTwo) {
 				return
 			}
-			indexToEs(e1,e2,wsh,string(msgTwo),1)
+			if(len(wsh.server.Config.EsUrl)>0) {
+				indexToEs(e1, e2, wsh, string(msgTwo), 1)
+			}
 		}
 	}
-
 }
 
 func indexToEs(e1, e2 Endpoint, wsh *WebsocketdHandler,msg string,mtype int) {

@@ -87,7 +87,7 @@ func parseCommandLine() *Config {
 	allowOriginsFlag := flag.String("origin", "", "Restrict upgrades if origin does not match the list")
 	canonicalHostname, _ := os.Hostname()
 	agentName := flag.String("agentname",canonicalHostname,"agent name(hostname as default)")
-	es_url := flag.String("esurl","http://localhost:9200","agent name(hostname as default)")
+	es_url := flag.String("esurl","","es url")
 
 	headers := Arglist(make([]string, 0))
 	headersWs := Arglist(make([]string, 0))
