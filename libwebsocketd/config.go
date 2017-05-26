@@ -37,4 +37,5 @@ type Config struct {
 	ParentEnv []string // Variables kept from os.Environ() before sanitizing it for subprocess.
 	HostName string
 	EsUrl   string
+	Log2ES bool
 }

@@ -53,7 +53,7 @@ func main() {
 	//os.Clearenv() // it's ok to wipe it clean, we already read env variables from passenv into config
 	//log.Info("server","config parent env : %s",strings.Join(config.ParentEnv,"\n"))
 	var es_handler *libwebsocketd.EsHandler
-	if(len(config.Config.EsUrl) > 0){
+	if(config.Config.Log2ES){
 		es_handler = libwebsocketd.NewESHandler(config.Config,log)
 	}
 	http_handler := libwebsocketd.NewWebsocketdServer(config.Config, log, config.MaxForks,es_handler)

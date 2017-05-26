@@ -9,7 +9,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -149,12 +148,8 @@ func parseCommandLine() *Config {
 	config.ServerSoftware = fmt.Sprintf("websocketd/%s", Version())
 	config.HostName = *agentName
 	config.EsUrl = *es_url
+	config.Log2ES = len(*es_url) > 0
 
-	if len(os.Args) == 1 {
-		fmt.Printf("Command line arguments are missing.\n")
-		ShortHelp()
-		os.Exit(1)
-	}
 
 	if *versionFlag {
 		fmt.Printf("%s %s\n", HelpProcessName(), Version())
@@ -204,28 +199,12 @@ func parseCommandLine() *Config {
 	}
 	config.SameOrigin = *sameOriginFlag
 
-	args := flag.Args()
-	if len(args) < 1 && config.ScriptDir == "" && config.StaticDir == "" && config.CgiDir == "" {
-		fmt.Fprintf(os.Stderr, "Please specify COMMAND or provide --dir, --staticdir or --cgidir argument.\n")
-		ShortHelp()
-		os.Exit(1)
-	}
-
-	if len(args) > 0 {
-		if config.ScriptDir != "" {
-			fmt.Fprintf(os.Stderr, "Ambiguous. Provided COMMAND and --dir argument. Please only specify just one.\n")
-			ShortHelp()
-			os.Exit(1)
-		}
-		if path, err := exec.LookPath(args[0]); err == nil {
-			config.CommandName = path // This can be command in PATH that we are able to execute
-			config.CommandArgs = flag.Args()[1:]
-			config.UsingScriptDir = false
-		} else {
-			fmt.Fprintf(os.Stderr, "Unable to locate specified COMMAND '%s' in OS path.\n", args[0])
-			ShortHelp()
-			os.Exit(1)
-		}
+	dir, _ := os.Getwd()
+	config.UsingScriptDir = false
+	if runtime.GOOS == "windows" {
+		config.CommandName = dir + "/wrapper/eval.bat"
+	}else{
+		config.CommandName = dir + "/wrapper/eval.sh"
 	}
 
 	if config.ScriptDir != "" {

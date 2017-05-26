@@ -17,7 +17,5 @@ go get -u github.com/golang/dep/cmd/dep
 cd $GOPATH/src;git clone https://e.coding.net/scirichon/OpsAgent.git
 cd OpsAgent;dep ensure
 go install
-cd examples/windows-vbscript
-OpsAgent console.cmd
-start console.html
+OpsAgent
 ```
