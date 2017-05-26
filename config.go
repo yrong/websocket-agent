@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
 	"OpsAgent/libwebsocketd"
 )
 
@@ -202,7 +201,7 @@ func parseCommandLine() *Config {
 	dir, _ := os.Getwd()
 	config.UsingScriptDir = false
 	if runtime.GOOS == "windows" {
-		config.CommandName = dir + "/wrapper/eval.bat"
+		config.CommandName = filepath.Join(dir,"wrapper","eval.bat")
 	}else{
 		config.CommandName = dir + "/wrapper/eval.sh"
 	}
