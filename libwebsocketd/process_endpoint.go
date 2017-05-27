@@ -16,6 +16,7 @@ type ProcessEndpoint struct {
 	process   *LaunchedProcess
 	closetime time.Duration
 	output    chan []byte
+	error_output    chan []byte
 	log       *LogScope
 	bin       bool
 }
@@ -24,6 +25,7 @@ func NewProcessEndpoint(process *LaunchedProcess, bin bool, log *LogScope) *Proc
 	return &ProcessEndpoint{
 		process: process,
 		output:  make(chan []byte),
+		error_output: make(chan []byte),
 		log:     log,
 		bin:     bin,
 	}
@@ -90,6 +92,10 @@ func (pe *ProcessEndpoint) Output() chan []byte {
 	return pe.output
 }
 
+func (pe *ProcessEndpoint) ErrorOutput() chan []byte {
+	return pe.error_output
+}
+
 func (pe *ProcessEndpoint) Send(msg []byte) bool {
 	pe.process.stdin.Write(msg)
 	return true
@@ -151,8 +157,9 @@ func (pe *ProcessEndpoint) log_stderr() {
 			break
 		}
 		pe.log.Error("stderr", "%s", string(trimEOL(buf)))
-		pe.output <- trimEOL(buf)
+		pe.error_output <- trimEOL(buf)
 	}
+	close(pe.error_output)
 }
 
 // trimEOL cuts unixy style \n and windowsy style \r\n suffix from the string

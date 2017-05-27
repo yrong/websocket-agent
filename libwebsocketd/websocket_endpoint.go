@@ -14,6 +14,7 @@ import (
 type WebSocketEndpoint struct {
 	ws     *websocket.Conn
 	output chan []byte
+	error_output chan[]byte
 	log    *LogScope
 	bin    bool
 }
@@ -22,6 +23,7 @@ func NewWebSocketEndpoint(ws *websocket.Conn, bin bool, log *LogScope) *WebSocke
 	return &WebSocketEndpoint{
 		ws:     ws,
 		output: make(chan []byte),
+		error_output: make(chan []byte),
 		log:    log,
 		bin:    bin,
 	}
@@ -35,6 +37,10 @@ func (we *WebSocketEndpoint) Output() chan []byte {
 	return we.output
 }
 
+func (we *WebSocketEndpoint) ErrorOutput() chan []byte {
+	return we.error_output
+}
+
 func (we *WebSocketEndpoint) Send(msg []byte) bool {
 	var err error
 	if we.bin {
@@ -42,6 +48,15 @@ func (we *WebSocketEndpoint) Send(msg []byte) bool {
 	} else {
 		err = websocket.Message.Send(we.ws, string(msg))
 	}
+	if err != nil {
+		we.log.Trace("websocket", "Cannot send: %s", err)
+		return false
+	}
+	return true
+}
+
+func (we *WebSocketEndpoint) SendJson(command CommandInfo) bool {
+	err := websocket.JSON.Send(we.ws,command)
 	if err != nil {
 		we.log.Trace("websocket", "Cannot send: %s", err)
 		return false

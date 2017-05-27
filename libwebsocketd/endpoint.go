@@ -13,12 +13,14 @@ type Endpoint interface {
 	StartReading()
 	Terminate()
 	Output() chan []byte
+	ErrorOutput() chan []byte
 	Send([]byte) bool
 }
 
 const(
 	in = iota
 	out
+	error_out
 )
 
 type CommandInfo struct {
@@ -30,6 +32,7 @@ type CommandInfo struct {
 	Hostname string `json:"hostname"`
 }
 
+
 func PipeEndpoints(e1, e2 Endpoint, wsh *WebsocketdHandler) {
 	e1.StartReading()
 	e2.StartReading()
@@ -39,33 +42,44 @@ func PipeEndpoints(e1, e2 Endpoint, wsh *WebsocketdHandler) {
 
 	for {
 		select {
-		case msgOne, ok := <-e1.Output():
-			if !ok || !e2.Send(msgOne) {
+		case msg, ok := <-e1.Output():
+			if !ok {
 				return
 			}
-			if(wsh.server.Config.Log2ES){
-				indexToEs(e1,e2,wsh,string(msgOne),out)
-			}
-		case msgTwo, ok := <-e2.Output():
-			if !ok || !e1.Send(msgTwo) {
+			pipe2OtherEndPointAndIndexToES(e1,e2,wsh,msg,out)
+		case msg, ok := <-e1.ErrorOutput():
+			if !ok {
 				return
 			}
-			if(wsh.server.Config.Log2ES) {
-				indexToEs(e1, e2, wsh, string(msgTwo), in)
+			pipe2OtherEndPointAndIndexToES(e1,e2,wsh,msg,error_out)
+		case msg, ok := <-e2.Output():
+			if !ok  {
+				return
 			}
+			pipe2OtherEndPointAndIndexToES(e1, e2,wsh, msg, in)
 		}
 	}
 }
 
-func indexToEs(e1, e2 Endpoint, wsh *WebsocketdHandler,msg string,mtype int) {
+func pipe2OtherEndPointAndIndexToES(e1,e2 Endpoint, wsh *WebsocketdHandler,msg []byte,mtype int) {
+	var command CommandInfo
 	if process_endpoint, ok := e1.(*ProcessEndpoint); ok {
-		var command CommandInfo
-		command.Message = msg
+		command.Message = string(msg)
 		command.Pid = process_endpoint.process.cmd.Process.Pid
 		command.SourceIp = wsh.RemoteInfo.Host
 		command.Timestamp = time.Now().Unix()
 		command.Type = mtype
 		command.Hostname = wsh.server.Config.HostName
+	}
+	if mtype == out||mtype == error_out{
+		if ws_endpoint, ok := e2.(*WebSocketEndpoint); ok {
+			ws_endpoint.SendJson(command)
+		}
+	}else if mtype == in {
+		e1.Send(msg)
+	}
+	if wsh.server.Config.Log2ES {
 		wsh.server.es_handler.index(command)
 	}
 }
+
