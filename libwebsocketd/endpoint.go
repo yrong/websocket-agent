@@ -46,22 +46,22 @@ func PipeEndpoints(e1, e2 Endpoint, wsh *WebsocketdHandler) {
 			if !ok {
 				return
 			}
-			pipe2OtherEndPointAndIndexToES(e1,e2,wsh,msg,out)
+			pipe2OtherEndPoint(e1,e2,wsh,msg,out)
 		case msg, ok := <-e1.ErrorOutput():
 			if !ok {
 				return
 			}
-			pipe2OtherEndPointAndIndexToES(e1,e2,wsh,msg,error_out)
+			pipe2OtherEndPoint(e1,e2,wsh,msg,error_out)
 		case msg, ok := <-e2.Output():
 			if !ok  {
 				return
 			}
-			pipe2OtherEndPointAndIndexToES(e1, e2,wsh, msg, in)
+			pipe2OtherEndPoint(e1, e2,wsh, msg, in)
 		}
 	}
 }
 
-func pipe2OtherEndPointAndIndexToES(e1,e2 Endpoint, wsh *WebsocketdHandler,msg []byte,mtype int) {
+func pipe2OtherEndPoint(e1,e2 Endpoint, wsh *WebsocketdHandler,msg []byte,mtype int) {
 	var command CommandInfo
 	if process_endpoint, ok := e1.(*ProcessEndpoint); ok {
 		command.Message = string(msg)
@@ -77,9 +77,6 @@ func pipe2OtherEndPointAndIndexToES(e1,e2 Endpoint, wsh *WebsocketdHandler,msg [
 		}
 	}else if mtype == in {
 		e1.Send(msg)
-	}
-	if wsh.server.Config.Log2ES {
-		wsh.server.es_handler.index(command)
 	}
 }
 
